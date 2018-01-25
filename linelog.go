@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strconv"
 	"time"
+  "fmt"
 )
 
 var matcherClasic []string
@@ -13,7 +14,9 @@ var reClasic *regexp.Regexp
 var reApp *regexp.Regexp
 
 func init() {
-	reClasic = regexp.MustCompile(`(?P<date>[^Z]+Z) (?P<elb>[^\s]+) (?P<ipclient>[^:]+?):[0-9]+ (?P<ipnode>[^:]+?):[0-9]+ (?P<reqtime>[0-9\.]+) (?P<backtime>[0-9\.]+) (?P<restime>[0-9\.]+) (?P<elbcode>[0-9]{3}) (?P<backcode>[0-9]{3}) (?P<lenght1>[0-9]+) (?P<lenght2>[0-9]+) "(?P<Method>[A-Z]+) (?P<URL>[^"]+) HTTP/[0-9\.]+".*`)
+  //	reClasic = regexp.MustCompile(`(?P<date>[^Z]+Z) (?P<elb>[^\s]+) (?P<ipclient>[^:]+?):[0-9]+ (?P<ipnode>[^:]+?):[0-9]+ (?P<reqtime>[0-9\.]+) (?P<backtime>[0-9\.]+) (?P<restime>[0-9\.]+) (?P<elbcode>[0-9]{3}) (?P<backcode>[0-9]{3}) (?P<lenght1>[0-9]+) (?P<lenght2>[0-9]+) "(?P<Method>[A-Z]+) (?P<URL>[^"]+) HTTP/[0-9\.]+".*`)
+  reClasic = regexp.MustCompile(`(?P<date>[^Z]+Z) (?P<elb>[^\s]+) (?P<ipclient>[^:]+?):[0-9]+ (?P<ipnode>[^:]+?):[0-9]+ (?P<reqtime>[0-9\.]+) (?P<backtime>[0-9\.]+) (?P<restime>[0-9\.]+) (?P<elbcode>([0-9]{3}|-)) (?P<backcode>([0-9]{3}|-)) (?P<lenght1>[0-9]+) (?P<lenght2>[0-9]+) "(?P<Method>([A-Z]+|-)) (?P<URL>([^"]+|-)) (HTTP/[0-9\.]+"|-).*`)
+
 	matcherClasic = reClasic.SubexpNames()
 
 	reApp = regexp.MustCompile(`(?P<proto>[^\s]+) (?P<date>[^Z]+Z) (?P<target>[^\s]+) (?P<ipclient>[^:]+?):[0-9]+ (?P<ipnode>[^:]+?):[0-9]+ (?P<reqtime>[0-9\.]+) (?P<backtime>[-0-9\.]+) (?P<restime>[-0-9\.]+) (?P<elbcode>[0-9]{3}) (?P<backcode>([0-9]{3}|-)) (?P<lenght1>[0-9]+) (?P<lenght2>[0-9]+) "(?P<Method>[A-Z]+) (?P<URL>[^"]+) HTTP/[0-9\.]+".*`)
@@ -67,10 +70,12 @@ func (l *LineLog) parse(raw string) {
 	for i, n := range r[0] {
 		switch matcher[i] {
 		case "date":
+        fmt.Println("ip: ", n)
 			l.Time, _ = time.Parse(time.RFC3339Nano, n)
 			break
 		case "ipclient":
 			if analyze {
+        fmt.Println("ip: ", n)
 				l.IPClient = net.ParseIP(n)
 			}
 			break
