@@ -5,7 +5,6 @@ import (
 	"regexp"
 	"strconv"
 	"time"
-  "fmt"
 )
 
 var matcherClasic []string
@@ -70,12 +69,10 @@ func (l *LineLog) parse(raw string) {
 	for i, n := range r[0] {
 		switch matcher[i] {
 		case "date":
-        fmt.Println("ip: ", n)
 			l.Time, _ = time.Parse(time.RFC3339Nano, n)
 			break
 		case "ipclient":
 			if analyze {
-        fmt.Println("ip: ", n)
 				l.IPClient = net.ParseIP(n)
 			}
 			break
